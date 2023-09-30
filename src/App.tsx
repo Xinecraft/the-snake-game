@@ -1,216 +1,36 @@
-import { useEffect, useState } from "react";
-
 import Board from "./components/Board";
-import {
-  BOARD_SIZE,
-  DIRECTIONS,
-  INITIAL_FOOD,
-  INITIAL_SNAKE,
-  INITIAL_SNAKE_SPEED_MS,
-} from "./helpers/constants";
-import { useInterval } from "./hooks/useInterval";
-import { isSameDirection, getRandomTileInBoard } from "./helpers/functions";
-import { BonusFood } from "./types";
-
-const board = Array.from(Array(BOARD_SIZE), () =>
-  new Array(BOARD_SIZE).fill(0)
-);
+import { useSnakeGame } from "./hooks/useSnakeGame";
 
 function App() {
-  const [snake, setSnake] = useState<number[][]>(INITIAL_SNAKE);
-  const [food, setFood] = useState(INITIAL_FOOD);
-  const [level, setLevel] = useState(1); // more the level, faster the snake.
-  const [score, setScore] = useState(0);
-  const [snakeSpeed, setSnakeSpeed] = useState(INITIAL_SNAKE_SPEED_MS);
-  const [direction, setDirection] = useState(DIRECTIONS.DOWN);
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [bonusFood, setBonusFood] = useState<BonusFood | null>(null);
-
-  function runGame() {
-    if (checkCollision()) {
-      onGameOver();
-      return;
-    }
-    handleSnakeMovement();
-  }
-
-  function onGameOver() {
-    setIsGameOver(true);
-  }
-
-  function handleSnakeMovement() {
-    const snakeCopy = [...snake];
-    const head = snakeCopy[0];
-
-    const directionToMove = direction;
-    const newHead = [
-      head[0] + directionToMove[0],
-      head[1] + directionToMove[1],
-    ];
-
-    snakeCopy.unshift(newHead);
-
-    handleBonusFoodEat();
-    if (!handleFoodEat()) {
-      snakeCopy.pop();
-    }
-
-    setSnake(snakeCopy);
-  }
-
-  function handleBonusFoodEat() {
-    const head = snake[0];
-    if (bonusFood && head[0] === bonusFood.x && head[1] === bonusFood.y) {
-      onBonusFoodAte();
-    }
-  }
-
-  function onBonusFoodAte() {
-    const bonusFoodType = bonusFood?.type;
-    if (bonusFoodType === "double_score") {
-      setScore((prev) => prev * 2);
-    }
-    setBonusFood(null);
-  }
-
-  function handleFoodEat(): boolean {
-    const head = snake[0];
-    if (head[0] === food[0] && head[1] === food[1]) {
-      onFoodAte();
-      return true;
-    }
-    return false;
-  }
-
-  function onFoodAte() {
-    setScore((prev) => prev + 1);
-    generateNewFood();
-    generateBonusFood();
-  }
-
-  function generateNewFood() {
-    let randomCord = getRandomTileInBoard();
-    while (
-      snake.some(
-        (cell) => cell[0] === randomCord[0] && cell[1] === randomCord[1]
-      )
-    ) {
-      randomCord = getRandomTileInBoard();
-    }
-
-    setFood(randomCord);
-  }
-
-  function generateBonusFood() {
-    let randomCord = getRandomTileInBoard();
-    while (
-      snake.some(
-        (cell) => cell[0] === randomCord[0] && cell[1] === randomCord[1]
-      ) ||
-      (food[0] === randomCord[0] && food[1] === randomCord[1])
-    ) {
-      randomCord = getRandomTileInBoard();
-    }
-
-    // one in 10 chance of generating bonus food.
-    if (Math.random() < 0.1) {
-      const bonusFoodType = "double_score";
-      setBonusFood({
-        x: randomCord[0],
-        y: randomCord[1],
-        type: bonusFoodType,
-      });
-    } else {
-      setBonusFood(null);
-    }
-  }
-
-  function checkCollision() {
-    // Check if snake hits the wall.
-    const head = snake[0];
-    if (
-      head[0] < 0 ||
-      head[1] < 0 ||
-      head[0] >= BOARD_SIZE ||
-      head[1] >= BOARD_SIZE
-    ) {
-      return true;
-    }
-
-    // Check if snake bites itself.
-    const snakeCopy = [...snake];
-    const snakeBody = snakeCopy.slice(1);
-    return snakeBody.some((cell) => cell[0] === head[0] && cell[1] === head[1]);
-  }
-
-  useInterval(
-    () => {
-      runGame();
-    },
-    isGameOver ? null : snakeSpeed
-  );
-
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      switch (e.key) {
-        case "ArrowLeft":
-        case "a":
-        case "A":
-          if (isSameDirection(direction, DIRECTIONS.RIGHT)) return;
-          setDirection(DIRECTIONS.LEFT);
-          break;
-        case "ArrowRight":
-        case "d":
-        case "D":
-          if (isSameDirection(direction, DIRECTIONS.LEFT)) return;
-          setDirection(DIRECTIONS.RIGHT);
-          break;
-        case "ArrowDown":
-        case "s":
-        case "S":
-          if (isSameDirection(direction, DIRECTIONS.UP)) return;
-          setDirection(DIRECTIONS.DOWN);
-          break;
-        case "ArrowUp":
-        case "w":
-        case "W":
-          if (isSameDirection(direction, DIRECTIONS.DOWN)) return;
-          setDirection(DIRECTIONS.UP);
-          break;
-      }
-    }
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [direction]);
-
-  /**
-   * Increase speed with Level.
-   * TODO: Make it better.
-   * 1. Gradually increase instead of sudden increase.
-   * 2. Don't go below 50ms.
-   * 3. On each level up notify user.
-   */
-  useEffect(() => {
-    if (score % 5 === 0 && score !== 0) {
-      setLevel((prev) => prev + 1);
-      setSnakeSpeed((prev) => prev - 100);
-    }
-  }, [score]);
+  const {
+    board,
+    snake,
+    food,
+    level,
+    score,
+    isGameOver,
+    bonusFood,
+    restartGame,
+  } = useSnakeGame();
 
   return (
     <>
-      <div className="fancy">
-        <h1>Snake Game</h1>
+      <h1 className="text-center fancy text-teal-300 text-7xl -mt-10 pb-2">
+        The Snake Game
+      </h1>
+      <Board
+        isGameOver={isGameOver}
+        restartGame={restartGame}
+        snake={snake}
+        food={food}
+        board={board}
+        bonusFood={bonusFood}
+      />
+
+      <div className="flex text-2xl justify-between fancy mt-2 text-zinc-300">
         <div>Score: {score}</div>
         <div>Level: {level}</div>
       </div>
-      <Board snake={snake} food={food} board={board} bonusFood={bonusFood} />
-
-      {isGameOver && <div>Game Over</div>}
     </>
   );
 }

@@ -1,13 +1,15 @@
-export const BOARD_SIZE = 15;
+export const BOARD_SIZE = 18;
 
 export const INITIAL_SNAKE = [
-    [7, 7], // head at index 0
-    [7, 8],
+    [7, 1], // head at index 0
+    [7, 2],
 ];
 
-export const INITIAL_SNAKE_SPEED_MS = 300;
+export const INITIAL_SNAKE_SPEED_MS = 250;
 
 export const INITIAL_FOOD = [3, 3];
+
+export const BONUS_FOOD_CHANCE = 0.1;
 
 export const DIRECTIONS = {
     UP: [-1, 0],
