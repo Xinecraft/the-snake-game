@@ -34,15 +34,16 @@ export function useFirestore() {
     }
   };
 
-  const getScoresForUser = async () => {
+  const getScoresForUser = async (count: number) => {
     if (!authCtx.user) {
-      return false;
+      return [];
     }
 
     const q = query(
       collection(db, "scores"),
       where("uid", "==", authCtx.user.uid),
-      orderBy("value", "desc")
+      orderBy("value", "desc"),
+      limit(count)
     );
 
     const querySnapshot = await getDocs(q);

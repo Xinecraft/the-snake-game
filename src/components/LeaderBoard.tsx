@@ -10,6 +10,7 @@ export default function LeaderBoard() {
     getTopLeaderboard(50).then((list) => {
       setTop50(list);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -28,7 +29,11 @@ export default function LeaderBoard() {
             <div key={i} className="flex items-center justify-between mb-2">
               <span>
                 {i + 1} &nbsp;{" "}
-                {score.displayName ? score.displayName : <i>Guest</i>}
+                {score.displayName ? (
+                  score.displayName
+                ) : (
+                  <i className="text-gray-400">Guest</i>
+                )}
               </span>
               <span>{score.value}</span>
             </div>

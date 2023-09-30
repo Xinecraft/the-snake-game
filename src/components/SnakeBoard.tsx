@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { useFirestore } from "../hooks/useFirestore";
 import { useSnakeGame } from "../hooks/useSnakeGame";
 
 export default function SnakeBoard() {
@@ -11,6 +13,15 @@ export default function SnakeBoard() {
     bonusFood,
     restartGame,
   } = useSnakeGame();
+  const [highScore, setHighScore] = useState<number>(0);
+  const { getScoresForUser } = useFirestore();
+
+  useEffect(() => {
+    getScoresForUser(1).then((list) => {
+      setHighScore(list[0]?.value || 0);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isGameOver, highScore]);
 
   return (
     <div className="flex items-center justify-center flex-col">
@@ -64,6 +75,7 @@ export default function SnakeBoard() {
 
       <div className="flex text-2xl justify-between fancy mt-2 text-zinc-300 w-full">
         <div>Score: {score}</div>
+        <div>Hi: {highScore}</div>
         <div>Level: {level}</div>
       </div>
     </div>
