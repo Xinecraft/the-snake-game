@@ -1,0 +1,18 @@
+@import url(https://db.onlinewebfonts.com/c/1b811c87c7e77d657d34b67f1e950d37?family=Equilibrium);
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  /* background-color: #5abaaa; */
+}
+
+.fancy {
+  font-family: 'Equilibrium', sans-serif;
+  font-size: 20px;
+}
