@@ -1,4 +1,7 @@
-# React + TypeScript + Vite
+# The Snake Game
+
+![image](https://github.com/Xinecraft/the-snake-game/assets/3089863/1593ad3e-78bb-45af-8496-618a855e2981)
+
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
