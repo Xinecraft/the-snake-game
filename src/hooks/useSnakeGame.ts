@@ -10,6 +10,7 @@ import {
 import { useInterval } from "../hooks/useInterval";
 import { isSameDirection, getRandomTileInBoard } from "../helpers/functions";
 import { BonusFood } from "../types";
+import { useFirestore } from "./useFirestore";
 
 const board = Array.from(Array(BOARD_SIZE), () =>
   new Array(BOARD_SIZE).fill(0)
@@ -25,18 +26,25 @@ export function useSnakeGame() {
   const [direction, setDirection] = useState(DIRECTIONS.RIGHT);
   const [isGameOver, setIsGameOver] = useState(false);
   const [bonusFood, setBonusFood] = useState<BonusFood | null>(null);
+  const { addScoreForUser } = useFirestore();
 
   function runGame() {
     if (checkCollision()) {
       onGameOver();
       return;
     }
-    console.log("speed", snakeSpeed)
     handleSnakeMovement();
   }
 
   function onGameOver() {
     setIsGameOver(true);
+    addScoreToFirestore(score);
+  }
+
+  function addScoreToFirestore(score: number) {
+    addScoreForUser(score).catch(err => {
+      console.log("error adding score", err);
+    });
   }
 
   function checkCollision() {
@@ -206,7 +214,7 @@ export function useSnakeGame() {
    * Increase speed with Level.
    */
   useEffect(() => {
-    if (ateCount % 10 === 0 && ateCount !== 0) {
+    if (ateCount % 7 === 0 && ateCount !== 0) {
       setLevel((prev) => prev + 1);
 
       // don't increase speed if below 50ms, not possible to play.

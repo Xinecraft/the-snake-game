@@ -1,24 +1,19 @@
-import { BonusFood } from "../types";
+import { useSnakeGame } from "../hooks/useSnakeGame";
 
-type Props = {
-  board: number[][];
-  snake: number[][];
-  food: number[];
-  bonusFood: BonusFood | null;
-  isGameOver: boolean;
-  restartGame: () => void;
-};
+export default function SnakeBoard() {
+  const {
+    board,
+    snake,
+    food,
+    level,
+    score,
+    isGameOver,
+    bonusFood,
+    restartGame,
+  } = useSnakeGame();
 
-export default function Board({
-  board,
-  snake,
-  food,
-  bonusFood,
-  restartGame,
-  isGameOver,
-}: Props) {
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center flex-col">
       <div className="board border-4 border-zinc-700 relative inline-block">
         {board.map((row, i) => (
           <div key={i} className="row">
@@ -65,6 +60,11 @@ export default function Board({
             Over
           </div>
         )}
+      </div>
+
+      <div className="flex text-2xl justify-between fancy mt-2 text-zinc-300 w-full">
+        <div>Score: {score}</div>
+        <div>Level: {level}</div>
       </div>
     </div>
   );
