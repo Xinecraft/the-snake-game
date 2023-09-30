@@ -42,7 +42,7 @@ export function useSnakeGame() {
   }
 
   function addScoreToFirestore(score: number) {
-    addScoreForUser(score).catch(err => {
+    addScoreForUser(score).catch((err) => {
       console.log("error adding score", err);
     });
   }

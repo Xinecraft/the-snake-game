@@ -12,9 +12,9 @@ body {
 }
 
 .fancy {
-  font-family: 'Equilibrium', sans-serif;
+  font-family: "Equilibrium", sans-serif;
 }
 
 .row {
-    display: flex;
+  display: flex;
 }
