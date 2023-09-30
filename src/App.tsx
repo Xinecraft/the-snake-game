@@ -10,6 +10,7 @@ import {
 } from "./helpers/constants";
 import { useInterval } from "./hooks/useInterval";
 import { isSameDirection, getRandomTileInBoard } from "./helpers/functions";
+import { BonusFood } from "./types";
 
 const board = Array.from(Array(BOARD_SIZE), () =>
   new Array(BOARD_SIZE).fill(0)
@@ -23,6 +24,7 @@ function App() {
   const [snakeSpeed, setSnakeSpeed] = useState(INITIAL_SNAKE_SPEED_MS);
   const [direction, setDirection] = useState(DIRECTIONS.DOWN);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [bonusFood, setBonusFood] = useState<BonusFood | null>(null);
 
   function runGame() {
     if (checkCollision()) {
@@ -48,11 +50,27 @@ function App() {
 
     snakeCopy.unshift(newHead);
 
+    handleBonusFoodEat();
     if (!handleFoodEat()) {
       snakeCopy.pop();
     }
 
     setSnake(snakeCopy);
+  }
+
+  function handleBonusFoodEat() {
+    const head = snake[0];
+    if (bonusFood && head[0] === bonusFood.x && head[1] === bonusFood.y) {
+      onBonusFoodAte();
+    }
+  }
+
+  function onBonusFoodAte() {
+    const bonusFoodType = bonusFood?.type;
+    if (bonusFoodType === "double_score") {
+      setScore((prev) => prev * 2);
+    }
+    setBonusFood(null);
   }
 
   function handleFoodEat(): boolean {
@@ -65,17 +83,9 @@ function App() {
   }
 
   function onFoodAte() {
-    growSnake(1);
     setScore((prev) => prev + 1);
     generateNewFood();
-  }
-
-  function growSnake(size: number) {
-    const snakeCopy = [...snake];
-    for (let i = 0; i < size; i++) {
-      snakeCopy.push(snakeCopy[snakeCopy.length - 1]);
-    }
-    setSnake(snakeCopy);
+    generateBonusFood();
   }
 
   function generateNewFood() {
@@ -89,6 +99,30 @@ function App() {
     }
 
     setFood(randomCord);
+  }
+
+  function generateBonusFood() {
+    let randomCord = getRandomTileInBoard();
+    while (
+      snake.some(
+        (cell) => cell[0] === randomCord[0] && cell[1] === randomCord[1]
+      ) ||
+      (food[0] === randomCord[0] && food[1] === randomCord[1])
+    ) {
+      randomCord = getRandomTileInBoard();
+    }
+
+    // one in 10 chance of generating bonus food.
+    if (Math.random() < 0.1) {
+      const bonusFoodType = "double_score";
+      setBonusFood({
+        x: randomCord[0],
+        y: randomCord[1],
+        type: bonusFoodType,
+      });
+    } else {
+      setBonusFood(null);
+    }
   }
 
   function checkCollision() {
@@ -174,7 +208,7 @@ function App() {
         <div>Score: {score}</div>
         <div>Level: {level}</div>
       </div>
-      <Board snake={snake} food={food} board={board} />
+      <Board snake={snake} food={food} board={board} bonusFood={bonusFood} />
 
       {isGameOver && <div>Game Over</div>}
     </>
