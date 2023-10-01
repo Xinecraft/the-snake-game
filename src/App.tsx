@@ -9,7 +9,7 @@ function App() {
 
   return (
     <>
-      <h1 className="text-center fancy text-teal-300 text-7xl -mt-10 pb-2">
+      <h1 className="text-center fancy text-teal-300 text-7xl pb-2">
         The Snake Game
       </h1>
 

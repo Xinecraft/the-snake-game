@@ -47,7 +47,7 @@ export default function SnakeBoard() {
                 <span
                   key={"cell" + i + j}
                   className={
-                    `cell w-8 h-8 inline-flex items-center justify-center flex-col rounded-lg ` +
+                    `cell w-4 h-4 md:w-8 md:h-8 inline-flex items-center justify-center flex-col rounded-lg ` +
                     cellClass
                   }
                 >
